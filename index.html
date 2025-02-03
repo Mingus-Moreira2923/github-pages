@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Meridian Review</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.cdnjs.com/css?family=Playfair+Display:400,700,900&display=swap" rel="stylesheet">
+    <!-- React Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    <style>
+        #admin-button {
+            display: none;
+        }
+        .article-transition {
+            transition: all 0.3s ease-in-out;
+        }
+        .article-expanded {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
+            background: white;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Top Bar -->
+    <div class="border-b">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-2 text-sm">
+                <div>
+                    <span class="text-gray-600">Tuesday, January 14, 2025</span>
+                </div>
+                <div>
+                    <a href="#" class="text-gray-600 hover:text-gray-900">Today's Paper</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Masthead -->
+    <header class="container mx-auto px-4 py-6 text-center">
+        <h1 class="text-6xl font-bold" style="font-family: 'Playfair Display', serif;">
+            The Meridian Review
+        </h1>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="border-t border-b">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center space-x-6 py-3 text-sm">
+                <a href="index.html" class="text-gray-900 hover:text-blue-600 font-medium">Home</a>
+                <a href="world.html" class="text-gray-900 hover:text-blue-600">World</a>
+                <a href="politics.html" class="text-gray-900 hover:text-blue-600">Politics</a>
+                <a href="economy.html" class="text-gray-900 hover:text-blue-600">Economy</a>
+                <a href="business.html" class="text-gray-900 hover:text-blue-600">Business</a>
+                <a href="tech.html" class="text-gray-900 hover:text-blue-600">Tech</a>
+                <a href="opinion.html" class="text-gray-900 hover:text-blue-600">Opinion</a>
+                <a href="US.html" class="text-gray-900 hover:text-blue-600">U.S.</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Hidden Admin Button -->
+        <div class="text-center mb-8">
+            <a href="admin.html" id="admin-button">
+                <button class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                    Go to Admin Panel
+                </button>
+            </a>
+        </div>
+
+        <!-- React Root -->
+        <div id="root"></div>
+    </main>
+
+    <!-- Admin Access Script -->
+    <script>
+        const adminPassword = "*N$8zW@jT6p3";
+        document.addEventListener("keydown", (event) => {
+            if (event.ctrlKey && event.shiftKey && event.key === "A") {
+                const userPassword = prompt("Enter admin password:");
+                if (userPassword === adminPassword) {
+                    document.getElementById("admin-button").style.display = "block";
+                    alert("Admin access granted.");
+                } else {
+                    alert("Incorrect password. Access denied.");
+                }
+            }
+        });
+    </script>
+
+    <!-- React Components -->
+    <script type="text/babel">
+        // Article Component (same as in business page)
+        const Article = ({ article, isMain = false, isSecondary = false }) => {
+            const [isExpanded, setIsExpanded] = React.useState(false);
+
+            const handleClick = () => {
+                setIsExpanded(!isExpanded);
+            };
+
+            if (isExpanded) {
+                return (
+                    <div className="article-expanded">
+                        <div className="max-w-4xl mx-auto px-4 py-8">
+                            <button 
+                                onClick={handleClick}
+                                className="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                            >
+                                ← Back
+                            </button>
+                            
+                            <article>
+                                <img 
+                                    src={article.imageUrl || "/api/placeholder/800/400"} 
+                                    alt={article.title} 
+                                    className="w-full h-96 object-cover rounded-lg mb-6"
+                                />
+                                <h1 className="text-4xl font-serif mb-4">{article.title}</h1>
+                                <div className="text-gray-600 mb-4">
+                                    By {article.author} | {new Date(article.date).toLocaleDateString()}
+                                </div>
+                                <div className="prose max-w-none">
+                                    {article.content}
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (isMain) {
+                return (
+                    <article 
+                        className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer hover:shadow-xl article-transition"
+                        onClick={handleClick}
+                    >
+                        <img 
+                            src={article.imageUrl || "/api/placeholder/800/400"} 
+                            alt={article.title} 
+                            className="w-full h-96 object-cover"
+                        />
+                        <div className="p-6">
+                            <span className="text-sm text-gray-500 uppercase">{article.category}</span>
+                            <h2 className="text-4xl font-bold mt-2 mb-4" style={{fontFamily: "'Playfair Display', serif"}}>{article.title}</h2>
+                            <p className="text-xl text-gray-700 leading-relaxed mb-4">{article.preview}</p>
+                            <div className="flex items-center text-sm text-gray-500">
+                                <span>6 MIN READ</span>
+                                <span className="mx-2">|</span>
+                                <button className="text-blue-600 hover:text-blue-800">Read More →</button>
+                            </div>
+                        </div>
+                    </article>
+                );
+            }
+
+            if (isSecondary) {
+                return (
+                    <article 
+                        className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer hover:shadow-xl article-transition"
+                        onClick={handleClick}
+                    >
+                        <img 
+                            src={article.imageUrl || "/api/placeholder/400/200"} 
+                            alt={article.title} 
+                            className="w-full h-64 object-cover"
+                        />
+                        <div className="p-4">
+                            <span className="text-xs text-gray-500 uppercase">{article.category}</span>
+                            <h3 className="text-xl font-bold mt-2 mb-3" style={{fontFamily: "'Playfair Display', serif"}}>{article.title}</h3>
+                            <p className="text-gray-700 text-sm leading-relaxed">{article.preview}</p>
+                        </div>
+                    </article>
+                );
+            }
+
+            return (
+                <article 
+                    className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer hover:shadow-xl article-transition"
+                    onClick={handleClick}
+                >
+                    <img 
+                        src={article.imageUrl || "/api/placeholder/400/200"} 
+                        alt={article.title} 
+                        className="w-full h-48 object-cover"
+                    />
+                    <div className="p-4">
+                        <span className="text-xs text-gray-500 uppercase">{article.category}</span>
+                        <h3 className="text-lg font-bold mt-1 mb-2" style={{fontFamily: "'Playfair Display', serif"}}>{article.title}</h3>
+                        <p className="text-gray-600 text-sm">{article.preview}</p>
+                    </div>
+                </article>
+            );
+        };
+
+        // HomePage Component
+        const HomePage = () => {
+            const [articles, setArticles] = React.useState([]);
+
+            React.useEffect(() => {
+                const loadArticles = () => {
+                    const allArticles = JSON.parse(localStorage.getItem('articles')) || [];
+                    setArticles(allArticles);
+                };
+
+                loadArticles();
+                const interval = setInterval(loadArticles, 30000);
+                return () => clearInterval(interval);
+            }, []);
+
+            const mainFeature = articles.find(a => a.prominence === 'main');
+            const secondaryFeatures = articles.filter(a => a.prominence === 'secondary').slice(0, 2);
+            const gridStories = articles.filter(a => a.prominence === 'grid');
+
+            return (
+                <div>
+                    <div className="grid grid-cols-12 gap-8 mb-12">
+                        <div className="col-span-12 lg:col-span-8">
+                            {mainFeature ? (
+                                <Article article={mainFeature} isMain={true} />
+                            ) : (
+                                <p className="text-gray-500 text-center p-8">No main feature story available</p>
+                            )}
+                        </div>
+                        <div className="col-span-12 lg:col-span-4 space-y-6">
+                            {secondaryFeatures.length > 0 ? (
+                                secondaryFeatures.map(article => (
+                                    <Article 
+                                        key={article.id} 
+                                        article={article} 
+                                        isSecondary={true} 
+                                    />
+                                ))
+                            ) : (
+                                <p className="text-gray-500 text-center p-4">No secondary stories available</p>
+                            )}
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {gridStories.length > 0 ? (
+                            gridStories.map(article => (
+                                <Article key={article.id} article={article} />
+                            ))
+                        ) : (
+                            <p className="text-gray-500 text-center p-4 col-span-3">No additional stories available</p>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(
+            <HomePage />,
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
